@@ -1,7 +1,10 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
 
-import type { ClienteInsert, ClienteRow, ClienteUpdate } from "@/modules/clientes/domain/types";
-import type { Database } from "@/types/database";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@/types/database.generated";
+
+type ClienteRow = Database["public"]["Tables"]["cliente"]["Row"];
+type ClienteInsert = Database["public"]["Tables"]["cliente"]["Insert"];
+type ClienteUpdate = Database["public"]["Tables"]["cliente"]["Update"];
 
 export async function listClientes(supabase: SupabaseClient<Database>) {
   const { data, error } = await supabase
@@ -40,10 +43,11 @@ export async function createCliente(supabase: SupabaseClient<Database>, payload:
   return data satisfies ClienteRow;
 }
 
+
 export async function updateCliente(
   supabase: SupabaseClient<Database>,
   idCliente: string,
-  payload: ClienteUpdate,
+  payload: ClienteUpdate
 ) {
   const { data, error } = await supabase
     .from("cliente")

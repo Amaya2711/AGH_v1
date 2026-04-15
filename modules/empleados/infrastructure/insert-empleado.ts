@@ -1,5 +1,5 @@
 import { createServerSupabaseClient } from "@/services/supabase/server-client";
-import type { Database } from "@/types/database";
+import type { Database } from "@/types/database.generated";
 import { randomUUID } from "crypto";
 
 export async function insertEmpleado(data: Omit<Database["public"]["Tables"]["empleado"]["Insert"], "id_empleado">) {

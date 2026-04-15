@@ -1,7 +1,5 @@
-import { createClient } from "@supabase/supabase-js";
-
 import { getPrivateEnv, getPublicEnv } from "@/lib/env";
-import type { Database } from "@/types/database";
+import type { Database } from "@/types/database.generated";
 
 export function createAdminSupabaseClient() {
   const { NEXT_PUBLIC_SUPABASE_URL } = getPublicEnv();

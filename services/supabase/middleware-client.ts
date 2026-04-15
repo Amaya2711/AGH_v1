@@ -2,7 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 import { getPublicEnv } from "@/lib/env";
-import type { Database } from "@/types/database";
+import type { Database } from "@/types/database.generated";
 
 export async function updateSession(request: NextRequest) {
   const response = NextResponse.next({

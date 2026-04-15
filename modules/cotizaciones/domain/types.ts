@@ -1,4 +1,4 @@
-import type { Database } from "@/types/database";
+import type { Database } from "@/types/database.generated";
 
 export type CotizacionRow = Database["public"]["Tables"]["cotizacion"]["Row"];
 export type CotizacionInsert = Database["public"]["Tables"]["cotizacion"]["Insert"];

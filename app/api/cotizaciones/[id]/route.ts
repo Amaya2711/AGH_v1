@@ -9,7 +9,7 @@ import {
 import { getServerAuthSession } from "@/services/auth/session";
 import { sendCotizacionByEmail } from "@/services/cotizaciones/delivery";
 import { createAdminSupabaseClient } from "@/services/supabase/admin-client";
-import type { Database } from "@/types/database";
+import type { Database } from "@/types/database.generated";
 
 interface RouteContext {
   params: Promise<{ id: string }>;

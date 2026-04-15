@@ -3,7 +3,7 @@ import nodemailer from "nodemailer";
 import { getPrivateEnv } from "@/lib/env";
 import { getCotizacionDocumentoById } from "@/modules/cotizaciones/infrastructure/cotizacion.repository";
 import type { AuthSession } from "@/services/auth/session";
-import type { Database } from "@/types/database";
+import type { Database } from "@/types/database.generated";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { generateCotizacionPdf, getCotizacionPdfFilename } from "@/services/cotizaciones/pdf";

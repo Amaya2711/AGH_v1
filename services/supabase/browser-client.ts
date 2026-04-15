@@ -1,9 +1,7 @@
 "use client";
 
-import { createBrowserClient } from "@supabase/ssr";
-
 import { getPublicEnv } from "@/lib/env";
-import type { Database } from "@/types/database";
+import type { Database } from "@/types/database.generated";
 
 let browserClient: ReturnType<typeof createBrowserClient<Database>> | null = null;
 

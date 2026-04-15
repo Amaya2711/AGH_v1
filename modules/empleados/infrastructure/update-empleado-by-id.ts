@@ -1,5 +1,5 @@
 import { createServerSupabaseClient } from "@/services/supabase/server-client";
-import type { Database } from "@/types/database";
+import type { Database } from "@/types/database.generated";
 
 // @ts-ignore
 export async function updateEmpleadoById(id: string, data: any) {

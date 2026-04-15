@@ -1,0 +1,35 @@
+// Definición mínima del tipo Database para Supabase
+// Reemplaza esto con la definición generada por Supabase si la tienes
+
+export type Json = string | number | boolean | null | { [key: string]: Json } | Json[];
+
+export interface Database {
+  public: {
+    Tables: {
+      cliente: {
+        Row: {
+          id_cliente: string;
+          nombre: string;
+          created_at: string;
+          // Agrega aquí los demás campos de la tabla cliente
+        };
+        Insert: {
+          id_cliente?: string;
+          nombre: string;
+          created_at?: string;
+          // Agrega aquí los demás campos de la tabla cliente
+        };
+        Update: {
+          id_cliente?: string;
+          nombre?: string;
+          created_at?: string;
+          // Agrega aquí los demás campos de la tabla cliente
+        };
+      };
+      // Puedes agregar más tablas aquí
+    };
+    Views: {};
+    Functions: {};
+    Enums: {};
+  };
+}

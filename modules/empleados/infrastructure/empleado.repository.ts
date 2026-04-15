@@ -1,5 +1,5 @@
 import { createServerSupabaseClient } from "@/services/supabase/server-client";
-import type { Database } from "@/types/database";
+import type { Database } from "@/types/database.generated";
 
 export async function listEmpleados(supabase: Awaited<ReturnType<typeof createServerSupabaseClient>>) {
   const { data, error } = await supabase
