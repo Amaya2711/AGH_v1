@@ -39,7 +39,7 @@ export async function POST(request: Request) {
 
     const response = NextResponse.json({ message: "Ingreso correcto" }, { status: 200 });
     setAuthSession(response, {
-      userId: usuario.id_usuario,
+      userId: String(usuario.id_usuario),
       username: usuario.nombre_usuario,
       email: usuario.correo,
       issuedAt: Date.now(),
