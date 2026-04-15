@@ -116,12 +116,25 @@ export async function listDetracciones(supabase: SupabaseClient<Database>) {
 
 // ── Cotizaciones ─────────────────────────────────────────────────────────────
 
-export async function listCotizaciones(supabase: SupabaseClient<Database>) {
-  const { data: cotizaciones, error } = await supabase
-    .from("cotizacion")
-    .select("*")
-    .order("created_at", { ascending: false });
+export async function listCotizaciones(
+  supabase: SupabaseClient<Database>,
+  filtros?: { clienteId?: string; fechaDesde?: string; fechaHasta?: string; monedaId?: string }
+) {
+  let query = supabase.from("cotizacion").select("*").order("created_at", { ascending: false });
+  if (filtros?.clienteId) {
+    query = query.eq("id_cliente", filtros.clienteId);
+  }
+  if (filtros?.fechaDesde) {
+    query = query.gte("fecha", filtros.fechaDesde);
+  }
+  if (filtros?.fechaHasta) {
+    query = query.lte("fecha", filtros.fechaHasta);
+  }
+  if (filtros?.monedaId) {
+    query = query.eq("id_moneda", filtros.monedaId);
+  }
 
+  const { data: cotizaciones, error } = await query;
   if (error) throw new Error(error.message);
 
   const clienteIds = Array.from(new Set((cotizaciones ?? []).map((item) => item.id_cliente)));

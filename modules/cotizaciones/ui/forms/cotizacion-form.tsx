@@ -251,19 +251,11 @@ export function CotizacionForm({
     <form onSubmit={onSubmit} className="space-y-6">
       {/* ── Header ───────────────────────────────────────────────────────── */}
       <section className="rounded-xl border border-border bg-surface p-6 shadow-sm space-y-4 card-enter">
-        <h2 className="text-base font-semibold text-foreground">Datos de la cotizacion</h2>
+        {/* <h2 className="text-base font-semibold text-foreground">Datos de la cotizacion</h2> */}
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-[110px_170px_minmax(280px,1fr)_220px]">
-          <div>
-            <label className="mb-1 block text-sm font-semibold text-foreground">Año</label>
-            <Input
-              type="number"
-              {...register("anio", { valueAsNumber: true })}
-            />
-            {errors.anio && (
-              <p className="mt-1 text-xs text-danger">{errors.anio.message}</p>
-            )}
-          </div>
+        <div className="grid gap-4 lg:grid-cols-4 sm:grid-cols-2">
+          {/* Campo Año oculto, siempre año vigente */}
+          <input type="hidden" {...register("anio", { valueAsNumber: true })} value={new Date().getFullYear()} />
           <div>
             <label className="mb-1 block text-sm font-semibold text-foreground">Fecha</label>
             <Input type="date" {...register("fecha")} />
@@ -341,9 +333,6 @@ export function CotizacionForm({
               <p className="mt-1 text-xs text-danger">{errors.id_pago.message}</p>
             )}
           </div>
-        </div>
-
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-[170px_170px_130px_150px_170px]">
           <div>
             <label className="mb-1 block text-sm font-semibold text-foreground">Moneda</label>
             <select
@@ -361,41 +350,25 @@ export function CotizacionForm({
               <p className="mt-1 text-xs text-danger">{errors.id_moneda.message}</p>
             )}
           </div>
+        </div>
+
+        <div className="grid gap-4 lg:grid-cols-4 sm:grid-cols-2">
           <div>
-            <label className="mb-1 block text-sm font-semibold text-foreground">Estado</label>
-            <select
-              className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-              {...register("id_estado", { valueAsNumber: true })}
-            >
-              {estados.map((e) => (
-                <option key={e.id_estado} value={e.id_estado}>
-                  {e.nombre_estado}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="mb-1 block text-sm font-semibold text-foreground">
-              Valido (dias)
-            </label>
+            <label className="mb-1 block text-sm font-semibold text-foreground">Valido (dias)</label>
             <Input
               type="number"
               {...register("valido_dias", { valueAsNumber: true })}
             />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-semibold text-foreground">
-              Entrega (horas)
-            </label>
+            <label className="mb-1 block text-sm font-semibold text-foreground">Entrega (horas)</label>
             <Input
               type="number"
               {...register("entrega_horas", { valueAsNumber: true })}
             />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-semibold text-foreground">
-              Dias credito
-            </label>
+            <label className="mb-1 block text-sm font-semibold text-foreground">Dias credito</label>
             <Input
               type="number"
               placeholder="0"
@@ -404,40 +377,26 @@ export function CotizacionForm({
               })}
             />
           </div>
-        </div>
-
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-[minmax(300px,1fr)_220px]">
           <div>
-            <label className="mb-1 block text-sm font-semibold text-foreground">
-              Detraccion
-            </label>
+            <label className="mb-1 block text-sm font-semibold text-foreground">Detraccion</label>
             <select
               className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
               {...register("id_detraccion", {
                 setValueAs: (value) => (value ? value : null),
               })}
             >
-              <option value="">Sin detraccion</option>
-              {detracciones.map((item) => (
-                <option key={item.id} value={item.id}>
-                  {item.nombre} ({(item.porcentaje * 100).toFixed(2)}%)
+              {detracciones.length > 0 && (
+                <option key={detracciones[0].id} value={detracciones[0].id}>
+                  {detracciones[0].nombre} ({(detracciones[0].porcentaje * 100).toFixed(2)}%)
                 </option>
-              ))}
+              )}
             </select>
           </div>
-          <div className="flex items-end">
-            <div className="flex items-center gap-2 pb-2">
-              <input
-                id="estado"
-                type="checkbox"
-                className="h-4 w-4 rounded border-border text-primary focus:ring-ring"
-                {...register("estado")}
-              />
-              <label htmlFor="estado" className="text-sm text-foreground">
-                Cotizacion activa
-              </label>
-            </div>
-          </div>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-[minmax(300px,1fr)_220px]">
+          {/* Campo Cotizacion activa oculto, siempre true */}
+          <input type="hidden" {...register("estado")} value={true} />
         </div>
       </section>
 

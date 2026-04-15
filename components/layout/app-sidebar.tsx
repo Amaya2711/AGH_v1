@@ -23,7 +23,8 @@ export function AppSidebar() {
           const isEnabled =
             item.href === "/dashboard" ||
             item.href === "/clientes" ||
-            item.href === "/cotizaciones";
+            item.href === "/cotizaciones" ||
+            item.href === "/empleados";
 
           return (
             <Link

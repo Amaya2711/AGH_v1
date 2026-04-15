@@ -56,8 +56,47 @@ export async function buildCotizacionPdf(
   supabase: SupabaseClient<Database>,
   idCotizacion: string
 ) {
-  const cotizacion = await getCotizacionDocumentoById(supabase, idCotizacion);
-  const pdfBytes = await generateCotizacionPdf(cotizacion);
+  let cotizacion;
+  try {
+    cotizacion = await getCotizacionDocumentoById(supabase, idCotizacion);
+  } catch (err) {
+    console.error("[PDF] Error obteniendo cotización:", err);
+    throw new Error("No se pudo obtener la cotización: " + (err instanceof Error ? err.message : String(err)));
+  }
+
+  // Validar datos requeridos
+  if (!cotizacion) {
+    console.error("[PDF] Cotización no encontrada", { idCotizacion });
+    throw new Error("Cotización no encontrada");
+  }
+  if (!cotizacion.detalles || cotizacion.detalles.length === 0) {
+    console.error("[PDF] Cotización sin detalles", { cotizacion });
+    throw new Error("La cotización no tiene detalles");
+  }
+  if (!cotizacion.cliente) {
+    console.error("[PDF] Cotización sin cliente", { cotizacion });
+    throw new Error("La cotización no tiene cliente asociado");
+  }
+  if (!cotizacion.moneda) {
+    console.error("[PDF] Cotización sin moneda", { cotizacion });
+    throw new Error("La cotización no tiene moneda asociada");
+  }
+  if (!cotizacion.tipo_pago) {
+    console.error("[PDF] Cotización sin tipo de pago", { cotizacion });
+    throw new Error("La cotización no tiene tipo de pago asociado");
+  }
+  if (!cotizacion.estado_cotizacion) {
+    console.error("[PDF] Cotización sin estado", { cotizacion });
+    throw new Error("La cotización no tiene estado asociado");
+  }
+
+  let pdfBytes;
+  try {
+    pdfBytes = await generateCotizacionPdf(cotizacion);
+  } catch (err) {
+    console.error("[PDF] Error generando PDF:", err, { cotizacion });
+    throw new Error("Error al generar PDF: " + (err instanceof Error ? err.message : String(err)));
+  }
 
   return {
     cotizacion,

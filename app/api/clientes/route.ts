@@ -16,7 +16,7 @@ export async function GET() {
     const clientes = await listClientes(supabase);
     return NextResponse.json(clientes, { status: 200 });
   } catch {
-    return NextResponse.json({ message: "Error al listar clientes" }, { status: 500 });
+    return NextResponse.json({ message: "Error al listar clientes." }, { status: 500 });
   }
 }
 

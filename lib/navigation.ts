@@ -1,4 +1,4 @@
-import { LayoutDashboard, Settings, ShieldCheck, UsersRound, FileSpreadsheet } from "lucide-react";
+import { LayoutDashboard, Settings, ShieldCheck, UsersRound, FileSpreadsheet, Badge } from "lucide-react";
 
 export interface NavItem {
   label: string;
@@ -13,6 +13,12 @@ export const ERP_NAV_ITEMS: NavItem[] = [
     href: "/dashboard",
     icon: LayoutDashboard,
     module: "dashboard",
+  },
+  {
+    label: "Empleados",
+    href: "/empleados",
+    icon: Badge,
+    module: "empleados",
   },
   {
     label: "Clientes",
