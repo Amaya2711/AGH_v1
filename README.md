@@ -1,3 +1,4 @@
+<!-- Despliegue forzado: actualización menor para activar build en Vercel -->
 # AGH ERP Web
 
 Plataforma ERP modular construida con Next.js App Router, TypeScript estricto, Tailwind CSS y Supabase.
