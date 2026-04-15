@@ -51,7 +51,7 @@ export async function POST(request: Request) {
       {
         ...header,
         dias_credito: header.dias_credito ?? null,
-        id_estado: header.id_estado !== undefined ? String(header.id_estado) : undefined,
+        id_estado: String(header.id_estado),
         created_by: user.userId,
         updated_by: user.userId,
         created_at: now,
