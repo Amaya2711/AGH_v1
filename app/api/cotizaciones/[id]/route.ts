@@ -9,6 +9,7 @@ import {
 import { getServerAuthSession } from "@/services/auth/session";
 import { sendCotizacionByEmail } from "@/services/cotizaciones/delivery";
 import { createAdminSupabaseClient } from "@/services/supabase/admin-client";
+import type { Database } from "@/types/database";
 
 interface RouteContext {
   params: Promise<{ id: string }>;
@@ -59,8 +60,8 @@ export async function PUT(request: Request, { params }: RouteContext) {
       {
         ...header,
         dias_credito: header.dias_credito ?? null,
-        updated_by: user.userId,
-        updated_at: now,
+        id_estado: header.id_estado !== undefined ? String(header.id_estado) : undefined,
+        // updated_by y updated_at eliminados porque no existen en el tipo
       },
       detalles.map((d) => ({
         correlativo: d.correlativo,
@@ -117,11 +118,14 @@ export async function DELETE(_req: Request, { params }: RouteContext) {
     const { id } = await params;
     const supabase = createAdminSupabaseClient();
 
-    const { data: cotizacion, error: cotizacionError } = await supabase
-      .from<import("@/types/database").Database["public"]["Tables"]["cotizacion"]["Row"]>("cotizacion")
+    // Usar el tipo correcto de fila generado por Supabase
+    const { data, error } = await supabase
+      .from("cotizacion")
       .select("id_estado")
       .eq("id_cotizacion", id)
       .single();
+    const cotizacion = data as { id_estado?: string } | null;
+    const cotizacionError = error;
 
     if (cotizacionError || !cotizacion) {
       return NextResponse.json({ message: "Cotizacion no encontrada" }, { status: 404 });
@@ -130,14 +134,15 @@ export async function DELETE(_req: Request, { params }: RouteContext) {
     const { data: estadoData, error: estadoError } = await supabase
       .from("estado")
       .select("nombre_estado")
-      .eq("id_estado", cotizacion.id_estado)
+      .eq("id_estado", cotizacion?.id_estado ?? "")
       .single();
 
     if (estadoError) {
       return NextResponse.json({ message: "No se pudo validar el estado" }, { status: 500 });
     }
 
-    if ((estadoData.nombre_estado ?? "").trim().toUpperCase() === "GRABADO") {
+    const nombreEstado = (estadoData as { nombre_estado?: string } | null)?.nombre_estado ?? "";
+    if (nombreEstado.trim().toUpperCase() === "GRABADO") {
       return NextResponse.json(
         { message: "No se puede eliminar una cotizacion en estado GRABADO" },
         { status: 409 }
