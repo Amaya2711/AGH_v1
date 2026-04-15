@@ -86,8 +86,9 @@ export function CotizacionForm({
   const router = useRouter();
   const [serverError, setServerError] = useState<string | null>(null);
   const [clienteQuery, setClienteQuery] = useState(() => {
+    const selectedClienteId = initialData?.cliente?.id_cliente ?? initialData?.cliente?.id_cliente;
     const selectedCliente = clientes.find(
-      (cliente) => cliente.id_cliente === initialData?.id_cliente
+      (cliente) => cliente.id_cliente === selectedClienteId
     );
     return selectedCliente ? `${selectedCliente.nombre} (${selectedCliente.ruc})` : "";
   });
@@ -101,7 +102,6 @@ export function CotizacionForm({
 
   const defaultDetalles =
     initialData?.detalles?.map((d) => ({
-      id_cotizacion: d.id_cotizacion,
       correlativo: d.correlativo,
       descripcion: d.descripcion,
       cantidad: d.cantidad,
@@ -129,23 +129,23 @@ export function CotizacionForm({
   } = useForm<CotizacionFormValues>({
     resolver: zodResolver(cotizacionSchema),
     defaultValues: {
-      anio: initialData?.anio ?? new Date().getFullYear(),
-      id_cliente: initialData?.id_cliente ?? "",
-      fecha: initialData?.fecha ?? currentLocalDate(),
-      id_pago: initialData?.id_pago ?? defaultTipoPagoId,
-      id_moneda: initialData?.id_moneda ?? defaultMonedaId,
-      valido_dias: initialData?.valido_dias ?? 15,
-      entrega_horas: initialData?.entrega_horas ?? 24,
+      anio: new Date().getFullYear(),
+      id_cliente: initialData?.cliente?.id_cliente ?? "",
+      fecha: currentLocalDate(),
+      id_pago: defaultTipoPagoId,
+      id_moneda: defaultMonedaId,
+      valido_dias: 15,
+      entrega_horas: 24,
       id_detraccion:
-        detracciones.find((item) => Math.abs(item.porcentaje * (initialData?.total_previo ?? 0) - (initialData?.detraccion ?? 0)) < 0.01)?.id ?? null,
-      subtotal: initialData?.subtotal ?? 0,
-      igv: initialData?.igv ?? 0,
-      total_previo: initialData?.total_previo ?? 0,
-      detraccion: initialData?.detraccion ?? 0,
-      total: initialData?.total ?? 0,
-      dias_credito: initialData?.dias_credito ?? null,
-      id_estado: initialData?.id_estado ?? (estados[0]?.id_estado ?? 1),
-      estado: initialData?.estado ?? true,
+        detracciones.find((item) => Math.abs(item.porcentaje * (0) - (0)) < 0.01)?.id ?? null,
+      subtotal: 0,
+      igv: 0,
+      total_previo: 0,
+      detraccion: 0,
+      total: 0,
+      dias_credito: null,
+      id_estado: estados[0]?.id_estado ?? 1,
+      estado: true,
       detalles: defaultDetalles,
     },
   });
@@ -214,7 +214,7 @@ export function CotizacionForm({
     const endpoint =
       mode === "create"
         ? "/api/cotizaciones"
-        : `/api/cotizaciones/${initialData?.id_cotizacion}`;
+        : "/api/cotizaciones/";
     const method = mode === "create" ? "POST" : "PUT";
 
     const response = await fetch(endpoint, {
@@ -378,18 +378,19 @@ export function CotizacionForm({
             />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-semibold text-foreground">Detraccion</label>
+            <label className="mb-1 block text-sm font-semibold text-foreground">Detracción</label>
             <select
               className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
               {...register("id_detraccion", {
                 setValueAs: (value) => (value ? value : null),
               })}
             >
-              {detracciones.length > 0 && (
-                <option key={detracciones[0].id} value={detracciones[0].id}>
-                  {detracciones[0].nombre} ({(detracciones[0].porcentaje * 100).toFixed(2)}%)
+              <option value="">Seleccionar detracción</option>
+              {detracciones.map((item) => (
+                <option key={item.id} value={item.id}>
+                  {item.nombre} ({(item.porcentaje * 100).toFixed(2)}%)
                 </option>
-              )}
+              ))}
             </select>
           </div>
         </div>
