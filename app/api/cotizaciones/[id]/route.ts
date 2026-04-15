@@ -89,7 +89,7 @@ export async function PUT(request: Request, { params }: RouteContext) {
       deliveryResult = {
         emailSent: false,
         recipient: null,
-        emailError: "No se pudo enviar el correo automatico.",
+        emailError: "No se pudo enviar el correo automatico",
       };
     }
 
