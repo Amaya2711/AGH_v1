@@ -20,7 +20,7 @@ export async function GET() {
     const cotizaciones = await listCotizaciones(supabase);
     return NextResponse.json(cotizaciones, { status: 200 });
   } catch {
-    return NextResponse.json({ message: "Error al listar cotizaciones" }, { status: 500 });
+    return NextResponse.json({ message: "Error al listar cotizaciones." }, { status: 500 });
   }
 }
 
