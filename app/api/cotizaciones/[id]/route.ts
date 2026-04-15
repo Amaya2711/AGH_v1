@@ -118,7 +118,7 @@ export async function DELETE(_req: Request, { params }: RouteContext) {
     const supabase = createAdminSupabaseClient();
 
     const { data: cotizacion, error: cotizacionError } = await supabase
-      .from<{ id_estado: string }>("cotizacion")
+      .from<import("@/types/database").Database["public"]["Tables"]["cotizacion"]["Row"]>("cotizacion")
       .select("id_estado")
       .eq("id_cotizacion", id)
       .single();
