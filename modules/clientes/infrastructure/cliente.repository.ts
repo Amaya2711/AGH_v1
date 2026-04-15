@@ -31,7 +31,7 @@ export async function getClienteById(supabase: SupabaseClient<Database>, idClien
 }
 
 export async function createCliente(supabase: SupabaseClient<Database>, payload: ClienteInsert) {
-  const { data, error } = await supabase.from("cliente").insert(payload).select("*").single();
+  const { data, error } = await supabase.from("cliente").insert([payload]).select("*").single();
 
   if (error) {
     throw new Error(error.message);
@@ -47,7 +47,7 @@ export async function updateCliente(
 ) {
   const { data, error } = await supabase
     .from("cliente")
-    .update(payload)
+    .update([payload])
     .eq("id_cliente", idCliente)
     .select("*")
     .single();
