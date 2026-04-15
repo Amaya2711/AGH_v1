@@ -396,7 +396,7 @@ export function CotizacionForm({
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-[minmax(300px,1fr)_220px]">
           {/* Campo Cotizacion activa oculto, siempre true */}
-          <input type="hidden" {...register("estado")} value={true} />
+          <input type="hidden" {...register("estado")} value="true" />
         </div>
       </section>
 
