@@ -16,7 +16,7 @@ export function useSession() {
   useEffect(() => {
     const supabase = createBrowserSupabaseClient();
 
-    supabase.auth.getUser().then(({ data }) => {
+    supabase.auth.getUser().then(({ data }: { data: { user: { id: string; email: string | null } } }) => {
       if (data.user) {
         setUser({ id: data.user.id, email: data.user.email ?? null });
       }
@@ -25,7 +25,7 @@ export function useSession() {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_, session) => {
+    } = supabase.auth.onAuthStateChange((_: any, session: any) => {
       if (!session?.user) {
         setUser(null);
         return;
