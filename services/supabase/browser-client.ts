@@ -1,3 +1,4 @@
+import { createBrowserClient } from "@supabase/ssr";
 "use client";
 
 import { getPublicEnv } from "@/lib/env";
