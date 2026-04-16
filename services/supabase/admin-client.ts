@@ -1,3 +1,4 @@
+import { createClient } from "@supabase/supabase-js";
 import { getPrivateEnv, getPublicEnv } from "@/lib/env";
 import type { Database } from "@/types/database.generated";
 
