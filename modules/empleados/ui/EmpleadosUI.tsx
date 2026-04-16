@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Empleado } from "../../domain/empleado";
+import { Empleado } from "../domain/empleado";
 import { getEmpleados, addEmpleado, updateEmpleado, inactivateEmpleado } from "../infrastructure/empleado-api";
 
 export function EmpleadosUI() {
