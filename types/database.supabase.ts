@@ -25,16 +25,28 @@ export namespace Database {
         Row: {
           id_cliente: string;
           nombre: string;
+          ruc: string;
+          direccion?: string | null;
+          telefono?: string | null;
+          estado: boolean;
           created_at: string;
         };
         Insert: {
           id_cliente?: string;
           nombre: string;
+          ruc: string;
+          direccion?: string | null;
+          telefono?: string | null;
+          estado: boolean;
           created_at?: string;
         };
         Update: {
           id_cliente?: string;
           nombre?: string;
+          ruc?: string;
+          direccion?: string | null;
+          telefono?: string | null;
+          estado?: boolean;
           created_at?: string;
         };
       };

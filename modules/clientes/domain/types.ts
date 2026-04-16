@@ -1,5 +1,5 @@
-import type { DatabaseType } from "@/types/database.supabase";
+import type { Database } from "@/types/database.supabase";
 
-export type ClienteRow = DatabaseType["public"]["Tables"]["cliente"]["Row"];
-export type ClienteInsert = DatabaseType["public"]["Tables"]["cliente"]["Insert"];
-export type ClienteUpdate = DatabaseType["public"]["Tables"]["cliente"]["Update"];
+export type ClienteRow = Database.public.Tables.cliente["Row"];
+export type ClienteInsert = Database.public.Tables.cliente["Insert"];
+export type ClienteUpdate = Database.public.Tables.cliente["Update"];
