@@ -7,5 +7,5 @@ export async function listEmpleados(supabase: Awaited<ReturnType<typeof createSe
     .select("*")
     .order("nombre_empleado", { ascending: true });
   if (error) throw error;
-  return data as Database["public"]["Tables"]["empleado"]["Row"][];
+  return data as Database["_public"]["Tables"]["empleado"]["Row"][];
 }

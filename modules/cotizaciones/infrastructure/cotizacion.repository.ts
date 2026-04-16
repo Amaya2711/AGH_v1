@@ -15,7 +15,7 @@ type DetraccionRaw = Record<string, unknown>;
 
 type DatabaseWithDetraccion = {
   public: {
-    Tables: Database["public"]["Tables"] & {
+    Tables: Database["_public"]["Tables"] & {
       detraccion: {
         Row: DetraccionRaw;
         Insert: DetraccionRaw;
@@ -23,10 +23,10 @@ type DatabaseWithDetraccion = {
         Relationships: [];
       };
     };
-    Views: Database["public"]["Views"];
-    Functions: Database["public"]["Functions"];
-    Enums: Database["public"]["Enums"];
-    CompositeTypes: Database["public"]["CompositeTypes"];
+    Views: Database["_public"]["Views"];
+    Functions: Database["_public"]["Functions"];
+    Enums: Database["_public"]["Enums"];
+    CompositeTypes: Database["_public"]["CompositeTypes"];
   };
 };
 

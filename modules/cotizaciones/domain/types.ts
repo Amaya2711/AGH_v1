@@ -1,8 +1,8 @@
 import type { Database } from "@/types/database.generated";
 
-export type CotizacionRow = Database["public"]["Tables"]["cotizacion"]["Row"];
-export type CotizacionInsert = Database["public"]["Tables"]["cotizacion"]["Insert"];
-export type CotizacionUpdate = Database["public"]["Tables"]["cotizacion"]["Update"];
+export type CotizacionRow = Database["_public"]["Tables"]["cotizacion"]["Row"];
+export type CotizacionInsert = Database["_public"]["Tables"]["cotizacion"]["Insert"];
+export type CotizacionUpdate = Database["_public"]["Tables"]["cotizacion"]["Update"];
 
 export type DetalleCotizacionRow =
   Database["public"]["Tables"]["detalle_cotizacion"]["Row"];

@@ -2,9 +2,9 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database.generated";
 
-type ClienteRow = Database["public"]["Tables"]["cliente"]["Row"];
-type ClienteInsert = Database["public"]["Tables"]["cliente"]["Insert"];
-type ClienteUpdate = Database["public"]["Tables"]["cliente"]["Update"];
+type ClienteRow = Database["_public"]["Tables"]["cliente"]["Row"];
+type ClienteInsert = Database["_public"]["Tables"]["cliente"]["Insert"];
+type ClienteUpdate = Database["_public"]["Tables"]["cliente"]["Update"];
 
 export async function listClientes(supabase: SupabaseClient<Database>) {
   const { data, error } = await supabase
