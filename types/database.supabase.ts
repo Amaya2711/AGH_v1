@@ -1,11 +1,11 @@
 // Tipo compatible con Supabase
 export type DatabaseType = {
-  public: {
+  _public: {
     Tables: {
       cliente: {
-        Row: Database.public.Tables.cliente["Row"];
-        Insert: Database.public.Tables.cliente["Insert"];
-        Update: Database.public.Tables.cliente["Update"];
+        Row: Database._public.Tables.cliente["Row"];
+        Insert: Database._public.Tables.cliente["Insert"];
+        Update: Database._public.Tables.cliente["Update"];
       };
     };
     Views: {};
@@ -19,7 +19,7 @@ export type DatabaseType = {
 export type Json = string | number | boolean | null | { [key: string]: Json } | Json[];
 
 export namespace Database {
-  export namespace public {
+  export namespace _public {
     export namespace Tables {
       export type cliente = {
         Row: {
