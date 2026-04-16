@@ -109,7 +109,7 @@ export async function listDetracciones(supabase: SupabaseClient<Database>) {
 
   if (error) throw new Error(error.message);
 
-  return ((data ?? []) as DetraccionRaw[])
+  return ((data ?? []) as unknown as DetraccionRaw[])
     .map(parseDetraccionOption)
     .filter((item): item is DetraccionOption => item !== null);
 }
