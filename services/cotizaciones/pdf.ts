@@ -174,7 +174,7 @@ export async function generateCotizacionPdf(cotizacion: CotizacionDocumento) {
   drawLine(cursorY);
   cursorY -= 18;
   drawText(
-    "Documento generado automaticamente desde AGH ERP.",
+    "Documento generado automaticamente desde AGH ERP",
     MARGIN,
     cursorY,
     { size: 9, color: MUTED_COLOR }
