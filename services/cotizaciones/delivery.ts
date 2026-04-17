@@ -120,7 +120,7 @@ export async function sendCotizacionByEmail(
     return {
       emailSent: false,
       recipient: null,
-      emailError: "Configuracion SMTP incompleta.",
+      emailError: "Configuracion SMTP incompleta",
     };
   }
 
