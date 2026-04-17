@@ -144,6 +144,11 @@ export async function generateCotizacionPdf(cotizacion: CotizacionDocumento) {
     drawText("LOGO", MARGIN + 18, logoY + 35, { size: 16, color: rgb(1,1,1), bold: true });
   }
 
+  // Número de cotización debajo del logo
+  // El logo está en (MARGIN, logoY) con altura logoHeight
+  const cotizacionY = logoY - 18; // 18 puntos debajo del borde inferior del logo
+  drawText(`N° ${cotizacionCode(cotizacion)}`, MARGIN, cotizacionY, { size: 12, bold: true, color: HEADER_COLOR });
+
   // Nombre empresa centrado (tamaño 11pt, más abajo)
   drawText("AGH ACEROS Y AFINES E.I.R.L.", PAGE_WIDTH / 2, cursorY + 25, { size: 11, bold: true, align: 'center' });
 
@@ -189,11 +194,13 @@ export async function generateCotizacionPdf(cotizacion: CotizacionDocumento) {
     drawText("MÁQUINA", machineX + 20, machineY + 15, { size: 10, color: rgb(0.2,0.2,0.2), bold: true });
   }
 
+  // (Eliminado: el número de cotización solo se muestra debajo del logo)
+
   // Datos de contacto (alineados a la derecha, debajo de la máquina)
   const contactoX = PAGE_WIDTH - MARGIN - 5;
   const contactoY = machineY - 8; // justo debajo de la imagen de la máquina
   drawText("RUC 20605387544", contactoX, contactoY, { size: 8, align: 'right' });
-  drawText("Cel. 990692586", contactoX, contactoY - 11, { size: 8, align: 'right' });
+  drawText("Cel. 934682181", contactoX, contactoY - 11, { size: 8, align: 'right' });
   drawText("g.lagos@agh-acerosyafines.com", contactoX, contactoY - 22, { size: 8, align: 'right' });
   drawText("Psje Los Ingleses Nro. 155 Urb. Astete", contactoX, contactoY - 33, { size: 8, align: 'right' });
   drawText("Las Perla - Callao", contactoX, contactoY - 44, { size: 8, align: 'right' });
