@@ -155,7 +155,7 @@ export async function generateCotizacionPdf(cotizacion: CotizacionDocumento) {
   const servicios = [
     "SERVICIO DE CORTE LASER EN PLANCHAS LAC, LAF, INOXIDABLE, ALUMINIO, COBRE Y BRONCE,",
     "DOBLEZ DE PLANCHAS A 3M DE LONGITUD, SERVICIO DE TROQUELADO SEGÚN MEDIDAS, ROLADO",
-    "DE PLANCHAS, LAF, LAC E INOXIDABLE."
+    "DE PLANCHAS, LAF, LAC E INOXIDABLE"
   ];
   // Limitar el ancho para que no se solape con logo/maquina (dejar margen de 80px a cada lado)
   const maxTextWidth = PAGE_WIDTH - 2 * (MARGIN + 80);
