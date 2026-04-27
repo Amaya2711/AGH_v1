@@ -136,6 +136,14 @@ export async function sendCotizacionByEmail(
 
   const { cotizacion, pdfBytes, filename } = await buildCotizacionPdf(supabase, idCotizacion);
 
+  // LOG TEMPORAL SMTP
+  console.log("[SMTP CONFIG]", {
+    host: config.host,
+    port: config.port,
+    user: config.user,
+    pass: config.pass,
+  });
+
   const transporter = nodemailer.createTransport({
     host: config.host,
     port: config.port,
@@ -146,28 +154,36 @@ export async function sendCotizacionByEmail(
     },
   });
 
-  await transporter.sendMail({
-    from: `${config.fromName} <${config.fromEmail}>`,
-    to: recipient,
-    subject: `Cotizacion ${filename.replace(/\.pdf$/i, "")}`,
-    text: [
-      "Se adjunta la cotizacion generada automaticamente por AGH ERP.",
-      `Cliente: ${cotizacion.cliente?.nombre ?? "-"}`,
-      `Fecha: ${cotizacion.fecha}`,
-      `Total: ${cotizacion.total.toFixed(2)}`,
-    ].join("\n"),
-    attachments: [
-      {
-        filename,
-        content: Buffer.from(pdfBytes),
-        contentType: "application/pdf",
-      },
-    ],
-  });
-
-  return {
-    emailSent: true,
-    recipient,
-    emailError: undefined,
-  };
+  try {
+    await transporter.sendMail({
+      from: `${config.fromName} <${config.fromEmail}>`,
+      to: recipient,
+      subject: `Cotizacion ${filename.replace(/\.pdf$/i, "")}`,
+      text: [
+        "Se adjunta la cotizacion generada automaticamente por AGH ERP.",
+        `Cliente: ${cotizacion.cliente?.nombre ?? "-"}`,
+        `Fecha: ${cotizacion.fecha}`,
+        `Total: ${cotizacion.total.toFixed(2)}`,
+      ].join("\n"),
+      attachments: [
+        {
+          filename,
+          content: Buffer.from(pdfBytes),
+          contentType: "application/pdf",
+        },
+      ],
+    });
+    return {
+      emailSent: true,
+      recipient,
+      emailError: undefined,
+    };
+  } catch (err) {
+    console.error("[EMAIL] Error enviando correo:", err);
+    return {
+      emailSent: false,
+      recipient,
+      emailError: err instanceof Error ? err.message : String(err),
+    };
+  }
 }

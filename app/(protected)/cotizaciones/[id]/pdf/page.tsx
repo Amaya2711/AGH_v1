@@ -7,12 +7,13 @@ interface CotizacionPdfPageProps {
   searchParams: Promise<{
     email?: string;
     recipient?: string;
+    emailError?: string;
   }>;
 }
 
 export default async function CotizacionPdfPage({ params, searchParams }: CotizacionPdfPageProps) {
   const { id } = await params;
-  const { email, recipient } = await searchParams;
+  const { email, recipient, emailError } = await searchParams;
   const emailSent = email === "ok";
   const emailFailed = email === "error";
 
@@ -43,7 +44,8 @@ export default async function CotizacionPdfPage({ params, searchParams }: Cotiza
 
       {emailFailed ? (
         <p className="rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-700">
-          La cotizacion se guardo y el PDF se genero, pero el envio automatico no pudo completarse. Revise la configuracion SMTP.
+          La cotizacion se guardo y el PDF se genero, pero el envio automatico no pudo completarse.<br />
+          <b>Error:</b> {emailError || "Revise la configuracion SMTP."}
         </p>
       ) : null}
 

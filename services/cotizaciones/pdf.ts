@@ -2,7 +2,6 @@
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import fs from "fs/promises";
 import path from "path";
-
 import type { CotizacionDocumento } from "@/modules/cotizaciones/domain/types";
 
 const PAGE_WIDTH = 595.28;
@@ -156,7 +155,7 @@ export async function generateCotizacionPdf(cotizacion: CotizacionDocumento) {
   const servicios = [
     "SERVICIO DE CORTE LASER EN PLANCHAS LAC, LAF, INOXIDABLE, ALUMINIO, COBRE Y BRONCE,",
     "DOBLEZ DE PLANCHAS A 3M DE LONGITUD, SERVICIO DE TROQUELADO SEGÚN MEDIDAS, ROLADO",
-    "DE PLANCHAS, LAF, LAC E INOXIDABLE"
+    "DE PLANCHAS, LAF, LAC E INOXIDABLE."
   ];
   // Limitar el ancho para que no se solape con logo/maquina (dejar margen de 80px a cada lado)
   const maxTextWidth = PAGE_WIDTH - 2 * (MARGIN + 80);
@@ -210,12 +209,31 @@ export async function generateCotizacionPdf(cotizacion: CotizacionDocumento) {
   cursorY -= 18;
   // --- FIN CABECERA ---
 
+
+  // --- DATOS DEL CLIENTE ---
   drawText("Cliente", MARGIN, cursorY, { size: 10, bold: true, color: HEADER_COLOR });
   cursorY -= 16;
   drawText(cotizacion.cliente?.nombre ?? "Sin cliente", MARGIN, cursorY, { size: 12, bold: true });
   cursorY -= 14;
   drawText(`RUC: ${cotizacion.cliente?.ruc ?? "-"}`, MARGIN, cursorY, { color: MUTED_COLOR });
-  cursorY -= 26;
+  cursorY -= 20;
+
+
+  // --- DATOS DE COTIZACION EN UNA SOLA LINEA ---
+  const datosLinea = [
+    { label: "Tipo de pago", value: cotizacion.tipo_pago?.forma_pago ?? "-" },
+    { label: "Validez (días)", value: cotizacion.validez_dias?.toString() ?? "-" },
+    { label: "Entrega (horas)", value: cotizacion.entrega_horas?.toString() ?? "-" },
+    { label: "Estado", value: cotizacion.estado_cotizacion?.nombre_estado ?? "-" },
+    { label: "Moneda", value: cotizacion.moneda?.nombre_moneda ?? "-" },
+  ];
+  const colWidth = (PAGE_WIDTH - 2 * MARGIN) / datosLinea.length;
+  let filaY = cursorY;
+  datosLinea.forEach((dato, idx) => {
+    drawText(dato.label, MARGIN + idx * colWidth, filaY, { size: 9, color: HEADER_COLOR, bold: true });
+    drawText(dato.value, MARGIN + idx * colWidth, filaY - 12, { size: 10 });
+  });
+  cursorY = filaY - 36; // Más espacio para evitar solapamiento con la cabecera del detalle
 
   page.drawRectangle({
     x: MARGIN,
@@ -280,12 +298,9 @@ export async function generateCotizacionPdf(cotizacion: CotizacionDocumento) {
     ["Subtotal", moneyWithSymbol(cotizacion.subtotal, selectedCurrencySymbol)],
     ["IGV", moneyWithSymbol(cotizacion.igv, selectedCurrencySymbol)],
     ["Total previo", moneyWithSymbol(cotizacion.total_previo, selectedCurrencySymbol)],
-    [
-      `Detraccion (${detraccionPercent.toFixed(2)}%)`,
-      moneyWithSymbol(cotizacion.detraccion, selectedCurrencySymbol),
-    ],
+    ["Detraccion (" + detraccionPercent.toFixed(2) + "%)", moneyWithSymbol(cotizacion.detraccion, selectedCurrencySymbol)],
     ["Total", moneyWithSymbol(cotizacion.total, selectedCurrencySymbol)],
-  ] as const;
+  ];
 
   totalRows.forEach(([label, value], index) => {
     drawText(label, labelX, cursorY, { bold: label === "Total", color: label === "Total" ? HEADER_COLOR : MUTED_COLOR });
