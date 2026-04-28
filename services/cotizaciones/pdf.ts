@@ -222,7 +222,7 @@ export async function generateCotizacionPdf(cotizacion: CotizacionDocumento) {
   // --- DATOS DE COTIZACION EN UNA SOLA LINEA ---
   const datosLinea = [
     { label: "Tipo de pago", value: cotizacion.tipo_pago?.forma_pago ?? "-" },
-    { label: "Validez (días)", value: cotizacion.validez_dias?.toString() ?? "-" },
+    { label: "Días crédito", value: typeof cotizacion.dias_credito === 'number' && cotizacion.dias_credito > 0 ? cotizacion.dias_credito.toString() : "-" },
     { label: "Entrega (horas)", value: cotizacion.entrega_horas?.toString() ?? "-" },
     { label: "Estado", value: cotizacion.estado_cotizacion?.nombre_estado ?? "-" },
     { label: "Moneda", value: cotizacion.moneda?.nombre_moneda ?? "-" },

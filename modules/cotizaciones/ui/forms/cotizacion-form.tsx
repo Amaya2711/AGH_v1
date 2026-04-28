@@ -132,19 +132,18 @@ export function CotizacionForm({
       anio: new Date().getFullYear(),
       id_cliente: initialData?.cliente?.id_cliente ?? "",
       fecha: currentLocalDate(),
-      id_pago: defaultTipoPagoId,
-      id_moneda: defaultMonedaId,
-      valido_dias: 15,
-      entrega_horas: 24,
-      id_detraccion:
-        detracciones.find((item) => Math.abs(item.porcentaje * (0) - (0)) < 0.01)?.id ?? null,
+      id_pago: initialData?.id_pago ?? defaultTipoPagoId,
+      id_moneda: initialData?.id_moneda ?? defaultMonedaId,
+      valido_dias: initialData?.valido_dias ?? 15,
+      entrega_horas: initialData?.entrega_horas ?? 24,
+      id_detraccion: initialData?.id_detraccion ?? (detracciones.find((item) => Math.abs(item.porcentaje * (0) - (0)) < 0.01)?.id ?? null),
       subtotal: 0,
       igv: 0,
       total_previo: 0,
       detraccion: 0,
       total: 0,
-      dias_credito: null,
-      id_estado: estados[0]?.id_estado ?? 1,
+      dias_credito: typeof initialData?.dias_credito === 'number' ? initialData.dias_credito : null,
+      id_estado: initialData?.id_estado ?? (estados[0]?.id_estado ?? 1),
       estado: true,
       detalles: defaultDetalles,
     },
@@ -214,7 +213,7 @@ export function CotizacionForm({
     const endpoint =
       mode === "create"
         ? "/api/cotizaciones"
-        : "/api/cotizaciones/";
+        : `/api/cotizaciones/${initialData?.id_cotizacion}`;
     const method = mode === "create" ? "POST" : "PUT";
 
     const response = await fetch(endpoint, {
