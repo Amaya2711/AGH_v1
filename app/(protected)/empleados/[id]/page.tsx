@@ -3,6 +3,7 @@ import { getEmpleadoById } from "@/modules/empleados/infrastructure/get-empleado
 import { updateEmpleadoById } from "@/modules/empleados/infrastructure/update-empleado-by-id";
 import { createServerSupabaseClient } from "@/services/supabase/server-client";
 import { EmpleadoForm } from "@/modules/empleados/ui/forms/empleado-form";
+import type { Empleado } from "@/modules/empleados/domain/empleado";
 
 interface EditarEmpleadoPageProps {
   params: { id: string };
@@ -13,7 +14,7 @@ export default async function EditarEmpleadoPage({ params }: EditarEmpleadoPageP
   const supabase = await createServerSupabaseClient();
   const empleado = await getEmpleadoById(supabase, id);
 
-  async function handleSubmit(data: any) {
+  async function handleSubmit(data: Partial<Empleado>) {
     "use server";
     await updateEmpleadoById(id, data);
   }

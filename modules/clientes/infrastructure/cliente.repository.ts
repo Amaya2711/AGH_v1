@@ -1,12 +1,8 @@
 
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { Database } from "@/types/database.generated";
+import type { ClienteInsert, ClienteRow, ClienteUpdate } from "@/modules/clientes/domain/types";
 
-type ClienteRow = Database["_public"]["Tables"]["cliente"]["Row"];
-type ClienteInsert = Database["_public"]["Tables"]["cliente"]["Insert"];
-type ClienteUpdate = Database["_public"]["Tables"]["cliente"]["Update"];
-
-export async function listClientes(supabase: SupabaseClient<Database>) {
+export async function listClientes(supabase: SupabaseClient) {
   const { data, error } = await supabase
     .from("cliente")
     .select("*")
@@ -16,10 +12,10 @@ export async function listClientes(supabase: SupabaseClient<Database>) {
     throw new Error(error.message);
   }
 
-  return data satisfies ClienteRow[];
+  return (data ?? []) as ClienteRow[];
 }
 
-export async function getClienteById(supabase: SupabaseClient<Database>, idCliente: string) {
+export async function getClienteById(supabase: SupabaseClient, idCliente: string) {
   const { data, error } = await supabase
     .from("cliente")
     .select("*")
@@ -30,22 +26,22 @@ export async function getClienteById(supabase: SupabaseClient<Database>, idClien
     throw new Error(error.message);
   }
 
-  return data satisfies ClienteRow;
+  return data as ClienteRow;
 }
 
-export async function createCliente(supabase: SupabaseClient<Database>, payload: ClienteInsert) {
+export async function createCliente(supabase: SupabaseClient, payload: ClienteInsert) {
   const { data, error } = await supabase.from("cliente").insert([payload]).select("*").single();
 
   if (error) {
     throw new Error(error.message);
   }
 
-  return data satisfies ClienteRow;
+  return data as ClienteRow;
 }
 
 
 export async function updateCliente(
-  supabase: SupabaseClient<Database>,
+  supabase: SupabaseClient,
   idCliente: string,
   payload: ClienteUpdate
 ) {
@@ -60,10 +56,10 @@ export async function updateCliente(
     throw new Error(error.message);
   }
 
-  return data satisfies ClienteRow;
+  return data as ClienteRow;
 }
 
-export async function deleteCliente(supabase: SupabaseClient<Database>, idCliente: string) {
+export async function deleteCliente(supabase: SupabaseClient, idCliente: string) {
   const { error } = await supabase.from("cliente").delete().eq("id_cliente", idCliente);
 
   if (error) {

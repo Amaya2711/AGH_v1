@@ -1,7 +1,6 @@
 import { createServerSupabaseClient } from "@/services/supabase/server-client";
-import type { Database } from "@/types/database.generated";
+import type { Empleado } from "@/modules/empleados/domain/empleado";
 
-// @ts-ignore
 export async function getEmpleadoById(supabase: Awaited<ReturnType<typeof createServerSupabaseClient>>, id: string) {
   const { data, error } = await supabase
     .from("empleado")
@@ -9,5 +8,5 @@ export async function getEmpleadoById(supabase: Awaited<ReturnType<typeof create
     .eq("id_empleado", id)
     .single();
   if (error) throw error;
-  return data;
+  return data as Empleado;
 }

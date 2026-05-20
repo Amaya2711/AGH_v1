@@ -13,10 +13,15 @@ export type MonedaRow = Database["public"]["Tables"]["moneda"]["Row"];
 export type TipoPagoRow = Database["public"]["Tables"]["tipo_pago"]["Row"];
 export type EstadoRow = Database["public"]["Tables"]["estado"]["Row"];
 export type ClienteRow = Database["public"]["Tables"]["cliente"]["Row"];
+export type UnidadMedidaRow = Database["public"]["Tables"]["unidad_medida"]["Row"];
+
+export interface DetalleCotizacionWithUnidad extends DetalleCotizacionRow {
+  unidad_medida?: Pick<UnidadMedidaRow, "id" | "um" | "abrevia"> | null;
+}
 
 export interface CotizacionConDetalle extends CotizacionRow {
   cliente: Pick<ClienteRow, "id_cliente" | "nombre" | "ruc"> | null;
-  detalles: DetalleCotizacionRow[];
+  detalles: DetalleCotizacionWithUnidad[];
 }
 
 export interface CotizacionDocumento extends CotizacionConDetalle {

@@ -34,6 +34,17 @@ interface Moneda {
   simbolo?: string;
 }
 
+interface CotizacionListItem {
+  id_cotizacion: string;
+  anio: number;
+  fecha: string;
+  total: number;
+  estado: boolean;
+  cliente: { nombre: string; ruc: string } | null;
+  moneda: { nombre_moneda: string; simbolo?: string | null } | null;
+  estado_cotizacion: { nombre_estado: string } | null;
+}
+
 async function fetchMonedas() {
   const res = await fetch("/api/monedas/list");
   if (!res.ok) return [];
@@ -54,12 +65,13 @@ async function fetchCotizaciones({ clienteId, fechaDesde, fechaHasta, monedaId }
 export default function CotizacionesPage() {
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [monedas, setMonedas] = useState<Moneda[]>([]);
-  const [cotizaciones, setCotizaciones] = useState([]);
+  const [cotizaciones, setCotizaciones] = useState<CotizacionListItem[]>([]);
   const [clienteId, setClienteId] = useState("");
   const [monedaId, setMonedaId] = useState("");
   const [fechaDesde, setFechaDesde] = useState("");
   const [fechaHasta, setFechaHasta] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [requestVersion, setRequestVersion] = useState(1);
+  const [resolvedVersion, setResolvedVersion] = useState(0);
   const clienteDivRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -68,11 +80,24 @@ export default function CotizacionesPage() {
   }, []);
 
   useEffect(() => {
-    setLoading(true);
+    let active = true;
+
     fetchCotizaciones({ clienteId, fechaDesde, fechaHasta, monedaId })
-      .then(setCotizaciones)
-      .finally(() => setLoading(false));
-  }, [clienteId, fechaDesde, fechaHasta, monedaId]);
+      .then((items) => {
+        if (!active) return;
+        setCotizaciones(items);
+        setResolvedVersion(requestVersion);
+      })
+      .catch(() => {
+        if (!active) return;
+        setCotizaciones([]);
+        setResolvedVersion(requestVersion);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [clienteId, fechaDesde, fechaHasta, monedaId, requestVersion]);
 
   useLayoutEffect(() => {
     if (!clienteDivRef.current) return;
@@ -85,6 +110,28 @@ export default function CotizacionesPage() {
     const px = Math.max(200, Math.min(600, max * 8));
     clienteDivRef.current.style.minWidth = px + "px";
   }, [clientes]);
+
+  const loading = requestVersion !== resolvedVersion;
+
+  const handleClienteChange = (value: string) => {
+    setClienteId(value);
+    setRequestVersion((current) => current + 1);
+  };
+
+  const handleMonedaChange = (value: string) => {
+    setMonedaId(value);
+    setRequestVersion((current) => current + 1);
+  };
+
+  const handleFechaDesdeChange = (value: string) => {
+    setFechaDesde(value);
+    setRequestVersion((current) => current + 1);
+  };
+
+  const handleFechaHastaChange = (value: string) => {
+    setFechaHasta(value);
+    setRequestVersion((current) => current + 1);
+  };
 
   return (
     <section className="space-y-6">
@@ -106,7 +153,7 @@ export default function CotizacionesPage() {
           <AutocompleteClient
             clientes={clientes}
             value={clienteId}
-            onChange={setClienteId}
+            onChange={handleClienteChange}
           />
         </div>
         <div>
@@ -114,7 +161,7 @@ export default function CotizacionesPage() {
           <select
             className="input input-bordered"
             value={monedaId}
-            onChange={e => setMonedaId(e.target.value)}
+            onChange={(e) => handleMonedaChange(e.target.value)}
           >
             <option value="">Todas</option>
             {monedas.map((m) => (
@@ -130,7 +177,7 @@ export default function CotizacionesPage() {
             type="date"
             className="input input-bordered"
             value={fechaDesde}
-            onChange={e => setFechaDesde(e.target.value)}
+            onChange={(e) => handleFechaDesdeChange(e.target.value)}
           />
         </div>
         <div>
@@ -139,7 +186,7 @@ export default function CotizacionesPage() {
             type="date"
             className="input input-bordered"
             value={fechaHasta}
-            onChange={e => setFechaHasta(e.target.value)}
+            onChange={(e) => handleFechaHastaChange(e.target.value)}
           />
         </div>
       </form>

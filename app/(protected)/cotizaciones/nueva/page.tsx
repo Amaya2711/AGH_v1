@@ -4,6 +4,7 @@ import {
   listEstados,
   listMonedas,
   listTiposPago,
+  listUnidadesMedida,
 } from "@/modules/cotizaciones/infrastructure/cotizacion.repository";
 import { CotizacionForm } from "@/modules/cotizaciones/ui/forms/cotizacion-form";
 import { createAdminSupabaseClient } from "@/services/supabase/admin-client";
@@ -11,12 +12,13 @@ import { createAdminSupabaseClient } from "@/services/supabase/admin-client";
 export default async function NuevaCotizacionPage() {
   const supabase = createAdminSupabaseClient();
 
-  const [clientes, monedas, tiposPago, estados, detracciones] = await Promise.all([
+  const [clientes, monedas, tiposPago, estados, detracciones, unidadesMedida] = await Promise.all([
     listClientesActivos(supabase),
     listMonedas(supabase),
     listTiposPago(supabase),
     listEstados(supabase),
     listDetracciones(supabase),
+    listUnidadesMedida(supabase),
   ]);
 
   return (
@@ -34,6 +36,7 @@ export default async function NuevaCotizacionPage() {
         tiposPago={tiposPago ?? []}
         estados={estados ?? []}
         detracciones={detracciones ?? []}
+        unidadesMedida={unidadesMedida ?? []}
       />
     </section>
   );

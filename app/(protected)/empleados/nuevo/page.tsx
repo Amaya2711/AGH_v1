@@ -2,10 +2,11 @@
 
 import { EmpleadoForm } from "@/modules/empleados/ui/forms/empleado-form";
 import { insertEmpleado } from "@/modules/empleados/infrastructure/insert-empleado";
+import type { Empleado } from "@/modules/empleados/domain/empleado";
 
 
 export default function NuevoEmpleadoPage() {
-  async function handleSubmit(data: any) {
+  async function handleSubmit(data: Partial<Empleado>) {
     "use server";
     await insertEmpleado(data);
   }

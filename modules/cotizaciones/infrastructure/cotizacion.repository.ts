@@ -9,9 +9,11 @@ import type {
   CotizacionUpdate,
   DetraccionOption,
   DetalleCotizacionInsert,
+  UnidadMedidaRow,
 } from "@/modules/cotizaciones/domain/types";
 
 type DetraccionRaw = Record<string, unknown>;
+type UnidadMedidaRaw = Record<string, unknown>;
 
 type DatabaseWithDetraccion = {
   public: {
@@ -20,6 +22,23 @@ type DatabaseWithDetraccion = {
         Row: DetraccionRaw;
         Insert: DetraccionRaw;
         Update: DetraccionRaw;
+        Relationships: [];
+      };
+    };
+    Views: Database["_public"]["Views"];
+    Functions: Database["_public"]["Functions"];
+    Enums: Database["_public"]["Enums"];
+    CompositeTypes: Database["_public"]["CompositeTypes"];
+  };
+};
+
+type DatabaseWithUnidadMedida = {
+  public: {
+    Tables: Database["_public"]["Tables"] & {
+      unidad_medida: {
+        Row: UnidadMedidaRaw;
+        Insert: UnidadMedidaRaw;
+        Update: UnidadMedidaRaw;
         Relationships: [];
       };
     };
@@ -51,6 +70,54 @@ function parseDetraccionOption(row: DetraccionRaw, index: number): DetraccionOpt
     id,
     nombre,
     porcentaje,
+  };
+}
+
+function parseUnidadMedidaOption(
+  row: UnidadMedidaRaw,
+  index: number
+) : Pick<UnidadMedidaRow, "id" | "um" | "abrevia"> | null {
+  const idRaw = row.id_unidad_medida ?? row.id ?? row.codigo ?? row.id_unidad;
+  const id = Number(idRaw);
+  if (!Number.isFinite(id) || id <= 0) {
+    return null;
+  }
+
+  const nombreRaw =
+    row.nombre_unidad_medida ??
+    row.nombre ??
+    row.um ??
+    row.descripcion ??
+    row.detalle ??
+    row.unidad_medida;
+  const nombre = typeof nombreRaw === "string" && nombreRaw.trim().length > 0
+    ? nombreRaw.trim()
+    : `Unidad ${index + 1}`;
+
+  const abreviaRaw = row.abreviatura ?? row.abreviado ?? row.abrevia ?? row.sigla ?? row.simbolo;
+  const abrevia =
+    typeof abreviaRaw === "string" && abreviaRaw.trim().length > 0
+      ? abreviaRaw.trim()
+      : null;
+
+  const estadoRaw = row.estado ?? row.activo;
+  const isActive =
+    typeof estadoRaw === "boolean"
+      ? estadoRaw
+      : typeof estadoRaw === "number"
+      ? estadoRaw === 1
+      : typeof estadoRaw === "string"
+      ? ["1", "true", "t", "activo", "activa"].includes(estadoRaw.trim().toLowerCase())
+      : true;
+
+  if (!isActive) {
+    return null;
+  }
+
+  return {
+    id,
+    um: nombre,
+    abrevia,
   };
 }
 
@@ -87,6 +154,26 @@ export async function listTiposPago(supabase: SupabaseClient<Database>) {
 
   if (error) throw new Error(error.message);
   return data;
+}
+
+export async function listUnidadesMedida(supabase: SupabaseClient<Database>) {
+  const supabaseWithUnidad = supabase as unknown as SupabaseClient<DatabaseWithUnidadMedida>;
+
+  const { data, error } = await supabaseWithUnidad
+    .from("unidad_medida")
+    .select("*");
+
+  if (error) throw new Error(error.message);
+
+  return ((data ?? []) as UnidadMedidaRaw[])
+    .map(parseUnidadMedidaOption)
+    .filter(
+      (
+        item
+      ): item is Pick<UnidadMedidaRow, "id" | "um" | "abrevia"> =>
+        item !== null
+    )
+    .sort((a, b) => a.um.localeCompare(b.um));
 }
 
 export async function listEstados(supabase: SupabaseClient<Database>) {
@@ -232,8 +319,16 @@ export async function getCotizacionDocumentoById(
   if (detalleRes.error) throw new Error(detalleRes.error.message);
 
   const cotizacion = cotizacionRes.data;
+  const detalleRows = detalleRes.data;
+  const unidadIds = Array.from(
+    new Set(
+      (detalleRows ?? [])
+        .map((item) => item.id_um)
+        .filter((item): item is number => typeof item === "number" && item > 0)
+    )
+  );
 
-  const [clienteRes, monedaRes, tipoPagoRes, estadoRes] = await Promise.all([
+  const [clienteRes, monedaRes, tipoPagoRes, estadoRes, unidadesRes] = await Promise.all([
     supabase
       .from("cliente")
       .select("id_cliente, nombre, ruc")
@@ -254,12 +349,31 @@ export async function getCotizacionDocumentoById(
       .select("id_estado, nombre_estado")
       .eq("id_estado", cotizacion.id_estado)
       .maybeSingle(),
+    unidadIds.length > 0
+      ? (supabase as unknown as SupabaseClient<DatabaseWithUnidadMedida>)
+          .from("unidad_medida")
+          .select("*")
+          .in("id", unidadIds)
+      : Promise.resolve({ data: [], error: null }),
   ]);
 
   if (clienteRes.error) throw new Error(clienteRes.error.message);
   if (monedaRes.error) throw new Error(monedaRes.error.message);
   if (tipoPagoRes.error) throw new Error(tipoPagoRes.error.message);
   if (estadoRes.error) throw new Error(estadoRes.error.message);
+  if (unidadesRes.error) throw new Error(unidadesRes.error.message);
+
+  const unidadesById = new Map(
+    ((unidadesRes.data ?? []) as UnidadMedidaRaw[])
+      .map(parseUnidadMedidaOption)
+      .filter(
+        (
+          item
+        ): item is Pick<UnidadMedidaRow, "id" | "um" | "abrevia"> =>
+          item !== null
+      )
+      .map((item) => [item.id, item])
+  );
 
   return {
     ...(cotizacion as CotizacionRow),
@@ -267,7 +381,10 @@ export async function getCotizacionDocumentoById(
     moneda: monedaRes.data,
     tipo_pago: tipoPagoRes.data,
     estado_cotizacion: estadoRes.data,
-    detalles: detalleRes.data,
+    detalles: (detalleRows ?? []).map((detalle) => ({
+      ...detalle,
+      unidad_medida: unidadesById.get(detalle.id_um ?? -1) ?? null,
+    })),
   };
 }
 

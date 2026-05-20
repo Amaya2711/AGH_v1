@@ -9,7 +9,6 @@ import {
 import { getServerAuthSession } from "@/services/auth/session";
 import { sendCotizacionByEmail } from "@/services/cotizaciones/delivery";
 import { createAdminSupabaseClient } from "@/services/supabase/admin-client";
-import type { Database } from "@/types/database.generated";
 
 interface RouteContext {
   params: Promise<{ id: string }>;
@@ -66,6 +65,8 @@ export async function PUT(request: Request, { params }: RouteContext) {
       detalles.map((d) => ({
         correlativo: d.correlativo,
         descripcion: d.descripcion,
+        id_um: d.id_um,
+        id_detraccion: null,
         cantidad: d.cantidad,
         precio_unitario: d.precio_unitario,
         total: d.total,
@@ -77,6 +78,8 @@ export async function PUT(request: Request, { params }: RouteContext) {
       }))
     );
 
+    const cotizacionId = String(cotizacion.id_cotizacion);
+
     let deliveryResult = {
       emailSent: false,
       recipient: null as string | null,
@@ -84,7 +87,7 @@ export async function PUT(request: Request, { params }: RouteContext) {
     };
 
     try {
-      deliveryResult = await sendCotizacionByEmail(supabase, cotizacion.id_cotizacion, user);
+      deliveryResult = await sendCotizacionByEmail(supabase, cotizacionId, user);
     } catch {
       deliveryResult = {
         emailSent: false,
@@ -95,8 +98,8 @@ export async function PUT(request: Request, { params }: RouteContext) {
 
     return NextResponse.json(
       {
-        id_cotizacion: cotizacion.id_cotizacion,
-        pdfUrl: `/cotizaciones/${cotizacion.id_cotizacion}/pdf`,
+        id_cotizacion: cotizacionId,
+        pdfUrl: `/cotizaciones/${cotizacionId}/pdf`,
         emailSent: deliveryResult.emailSent,
         recipient: deliveryResult.recipient,
         emailError: deliveryResult.emailError,

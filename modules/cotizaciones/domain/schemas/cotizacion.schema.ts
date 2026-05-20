@@ -3,6 +3,7 @@ import { z } from "zod";
 export const detalleSchema = z.object({
   id_cotizacion: z.string().uuid().optional(),
   correlativo: z.number().int().min(1),
+  id_um: z.number().int().positive("Seleccione unidad de medida"),
   descripcion: z.string().min(1, "Ingrese una descripción"),
   cantidad: z.number().positive("Cantidad debe ser mayor a 0"),
   precio_unitario: z.number().positive("Precio debe ser mayor a 0"),

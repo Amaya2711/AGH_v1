@@ -18,6 +18,7 @@ import type {
   EstadoRow,
   MonedaRow,
   TipoPagoRow,
+  UnidadMedidaRow,
 } from "@/modules/cotizaciones/domain/types";
 
 interface ClienteOption {
@@ -34,6 +35,10 @@ interface CotizacionFormProps {
   tiposPago: Pick<TipoPagoRow, "id_tipo" | "forma_pago">[];
   estados: Pick<EstadoRow, "id_estado" | "nombre_estado">[];
   detracciones: DetraccionOption[];
+  unidadesMedida: Pick<
+    UnidadMedidaRow,
+    "id" | "um" | "abrevia"
+  >[];
 }
 
 const IGV_RATE = 0.18;
@@ -82,6 +87,7 @@ export function CotizacionForm({
   tiposPago,
   estados,
   detracciones,
+  unidadesMedida,
 }: CotizacionFormProps) {
   const router = useRouter();
   const [serverError, setServerError] = useState<string | null>(null);
@@ -99,11 +105,13 @@ export function CotizacionForm({
   const defaultMonedaId =
     monedas.find((item) => item.nombre_moneda.trim().toUpperCase() === "SOLES")?.id_moneda ??
     "";
+  const defaultUnidadMedidaId = unidadesMedida[0]?.id ?? 0;
 
   const defaultDetalles =
     initialData?.detalles?.map((d) => ({
       correlativo: d.correlativo,
       descripcion: d.descripcion,
+      id_um: d.id_um ?? defaultUnidadMedidaId,
       cantidad: d.cantidad,
       precio_unitario: d.precio_unitario,
       total: d.total,
@@ -112,6 +120,7 @@ export function CotizacionForm({
       {
         correlativo: 1,
         descripcion: "",
+        id_um: defaultUnidadMedidaId,
         cantidad: 1,
         precio_unitario: 0,
         total: 0,
@@ -143,7 +152,7 @@ export function CotizacionForm({
       detraccion: 0,
       total: 0,
       dias_credito: typeof initialData?.dias_credito === 'number' ? initialData.dias_credito : null,
-      id_estado: initialData?.id_estado ?? (estados[0]?.id_estado ?? 1),
+      id_estado: Number(initialData?.id_estado ?? estados[0]?.id_estado ?? 1),
       estado: true,
       detalles: defaultDetalles,
     },
@@ -209,6 +218,11 @@ export function CotizacionForm({
 
   const onSubmit = handleSubmit(async (values) => {
     setServerError(null);
+
+    if (mode === "create") {
+      const confirmed = window.confirm("¿Está seguro que desea crear la cotización?");
+      if (!confirmed) return;
+    }
 
     const endpoint =
       mode === "create"
@@ -411,6 +425,7 @@ export function CotizacionForm({
               append({
                 correlativo: fields.length + 1,
                 descripcion: "",
+                id_um: defaultUnidadMedidaId,
                 cantidad: 1,
                 precio_unitario: 0,
                 total: 0,
@@ -435,7 +450,8 @@ export function CotizacionForm({
             <thead className="bg-surface-strong text-left text-xs uppercase tracking-wider text-muted-foreground">
               <tr>
                 <th className="px-3 py-2">#</th>
-                <th className="px-3 py-2 min-w-[260px]">Descripcion</th>
+                <th className="px-3 py-2 min-w-[900px]">Descripcion</th>
+                <th className="px-3 py-2 w-32">Unidad de medida</th>
                 <th className="px-3 py-2 w-24">Cantidad</th>
                 <th className="px-3 py-2 w-32">Precio unit.</th>
                 <th className="px-3 py-2 w-32 text-right">Total</th>
@@ -446,14 +462,39 @@ export function CotizacionForm({
               {fields.map((field, index) => (
                 <tr key={field.id} className="border-t border-border">
                   <td className="px-3 py-2 text-muted-foreground">{index + 1}</td>
-                  <td className="px-3 py-2">
+                  <td className="px-3 py-2 w-[540px]">
                     <Input
                       placeholder="Descripcion del bien o servicio"
+                      className="min-w-[500px]"
                       {...register(`detalles.${index}.descripcion`)}
                     />
                     {errors.detalles?.[index]?.descripcion && (
                       <p className="mt-0.5 text-xs text-danger">
                         {errors.detalles[index]?.descripcion?.message}
+                      </p>
+                    )}
+                  </td>
+                  <td className="px-3 py-2 w-32">
+                    <select
+                      className="min-w-[90px] max-w-[120px] rounded-lg border border-border bg-surface px-2 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                      {...register(`detalles.${index}.id_um`, {
+                        setValueAs: (value) => Number(value),
+                      })}
+                    >
+                      <option value="">Seleccionar unidad</option>
+                      {unidadesMedida.map((unidad) => (
+                        <option
+                          key={unidad.id}
+                          value={unidad.id}
+                        >
+                          {unidad.um}
+                          {unidad.abrevia ? ` (${unidad.abrevia})` : ""}
+                        </option>
+                      ))}
+                    </select>
+                    {errors.detalles?.[index]?.id_um && (
+                      <p className="mt-0.5 text-xs text-danger">
+                        {errors.detalles[index]?.id_um?.message}
                       </p>
                     )}
                   </td>

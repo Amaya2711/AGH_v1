@@ -47,9 +47,6 @@ export async function POST(request: Request) {
       direccion: parsed.data.direccion || null,
       telefono: parsed.data.telefono || null,
       estado: parsed.data.estado,
-      created_by: user.userId,
-      updated_by: user.userId,
-      updated_at: new Date().toISOString(),
     });
 
     return NextResponse.json(cliente, { status: 201 });

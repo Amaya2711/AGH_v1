@@ -3,15 +3,16 @@ import { createServerSupabaseClient } from "@/services/supabase/server-client";
 
 export async function GET() {
   const supabase = await createServerSupabaseClient();
-  const { data, error }: {
-    data: { id_tipodoc: string; nombre_documento: string }[] | null;
-    error: any;
-  } = await supabase
+  const { data, error } = await supabase
     .from("tipo_documento")
     .select("id_tipodoc, nombre_documento")
     .order("nombre_documento", { ascending: true });
   if (error) return NextResponse.json([], { status: 500 });
+
+  const tipoDocumento =
+    (data as { id_tipodoc: string; nombre_documento: string }[] | null) ?? [];
+
   return NextResponse.json(
-    (data || []).map((t) => ({ value: t.id_tipodoc, label: t.nombre_documento }))
+    tipoDocumento.map((t) => ({ value: t.id_tipodoc, label: t.nombre_documento }))
   );
 }

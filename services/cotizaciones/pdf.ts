@@ -33,16 +33,6 @@ function moneyWithSymbol(value: number, symbol: string) {
   return symbol ? `${symbol} ${money(value)}` : money(value);
 }
 
-function date(value: string) {
-  const [year, month, day] = value.split("-").map(Number);
-  if (!year || !month || !day) {
-    return value;
-  }
-
-  const safeDate = new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
-  return safeDate.toLocaleDateString("es-PE", { timeZone: "America/Lima" });
-}
-
 function cotizacionCode(cotizacion: CotizacionDocumento) {
   return `COT-${cotizacion.anio}-${cotizacion.id_cotizacion.slice(0, 8).toUpperCase()}`;
 }
@@ -158,7 +148,6 @@ export async function generateCotizacionPdf(cotizacion: CotizacionDocumento) {
     "DE PLANCHAS, LAF, LAC E INOXIDABLE."
   ];
   // Limitar el ancho para que no se solape con logo/maquina (dejar margen de 80px a cada lado)
-  const maxTextWidth = PAGE_WIDTH - 2 * (MARGIN + 80);
   const offsetX = 0; // Centrado, pero puedes ajustar a un valor positivo si quieres más a la derecha
   const newMargin = MARGIN + 40; // Aumentar el margen para más espacio de texto
   const newMaxTextWidth = PAGE_WIDTH - 2 * newMargin;
@@ -221,6 +210,8 @@ export async function generateCotizacionPdf(cotizacion: CotizacionDocumento) {
 
   // --- DATOS DE COTIZACION EN UNA SOLA LINEA ---
   const datosLinea = [
+    { label: "Fecha", value: cotizacion.fecha ? String(cotizacion.fecha).slice(0, 10) : "-" },
+    { label: "Válido (días)", value: cotizacion.valido_dias?.toString() ?? "-" },
     { label: "Tipo de pago", value: cotizacion.tipo_pago?.forma_pago ?? "-" },
     { label: "Días crédito", value: typeof cotizacion.dias_credito === 'number' && cotizacion.dias_credito > 0 ? cotizacion.dias_credito.toString() : "-" },
     { label: "Entrega (horas)", value: cotizacion.entrega_horas?.toString() ?? "-" },
@@ -228,7 +219,7 @@ export async function generateCotizacionPdf(cotizacion: CotizacionDocumento) {
     { label: "Moneda", value: cotizacion.moneda?.nombre_moneda ?? "-" },
   ];
   const colWidth = (PAGE_WIDTH - 2 * MARGIN) / datosLinea.length;
-  let filaY = cursorY;
+  const filaY = cursorY;
   datosLinea.forEach((dato, idx) => {
     drawText(dato.label, MARGIN + idx * colWidth, filaY, { size: 9, color: HEADER_COLOR, bold: true });
     drawText(dato.value, MARGIN + idx * colWidth, filaY - 12, { size: 10 });
@@ -244,19 +235,19 @@ export async function generateCotizacionPdf(cotizacion: CotizacionDocumento) {
   });
   drawText("Item", MARGIN + 8, cursorY, { size: 9, bold: true, color: rgb(1, 1, 1) });
   drawText("Descripcion", MARGIN + 48, cursorY, { size: 9, bold: true, color: rgb(1, 1, 1) });
+  drawText("Und.", 332, cursorY, { size: 9, bold: true, color: rgb(1, 1, 1) });
   drawText("Cant.", 380, cursorY, { size: 9, bold: true, color: rgb(1, 1, 1) });
   drawText("P. Unit.", 435, cursorY, { size: 9, bold: true, color: rgb(1, 1, 1) });
   drawText("Total", 510, cursorY, { size: 9, bold: true, color: rgb(1, 1, 1) });
   cursorY -= 22;
 
   const descX = MARGIN + 48;
-  const descYPad = 8; // padding superior para la descripción
-  const descWidth = 260; // ancho máximo de la columna descripción (más reducido)
+  const descWidth = 220; // ancho máximo de la columna descripcion
   const descFontSize = 9;
   cotizacion.detalles.forEach((detalle) => {
     // Dividir la descripción en líneas que quepan en el ancho de la columna
     const words = detalle.descripcion.split(' ');
-    let lines: string[] = [];
+    const lines: string[] = [];
     let currentLine = '';
     for (const word of words) {
       const testLine = currentLine ? currentLine + ' ' + word : word;
@@ -280,6 +271,14 @@ export async function generateCotizacionPdf(cotizacion: CotizacionDocumento) {
       drawText(line, descX, cursorY - 8 - i * 12, { size: descFontSize });
     });
     // Solo la primera línea lleva los otros campos, las demás solo la descripción
+    drawText(
+      detalle.unidad_medida?.abrevia ??
+        detalle.unidad_medida?.um ??
+        "-",
+      330,
+      cursorY - 8,
+      { size: descFontSize }
+    );
     drawText(money(detalle.cantidad), 374, cursorY - 8, { size: descFontSize });
     drawText(moneyWithSymbol(detalle.precio_unitario, selectedCurrencySymbol), 428, cursorY - 8, { size: descFontSize });
     drawText(moneyWithSymbol(detalle.total, selectedCurrencySymbol), 502, cursorY - 8, { size: descFontSize });

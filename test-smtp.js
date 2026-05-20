@@ -1,5 +1,5 @@
-require('dotenv').config();
-const nodemailer = require('nodemailer');
+import "dotenv/config";
+import nodemailer from "nodemailer";
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
@@ -18,7 +18,8 @@ transporter.sendMail({
   text: '¡La conexión SMTP funciona correctamente!',
 }, (error, info) => {
   if (error) {
-    return console.log('Error al enviar:', error);
+    console.log('Error al enviar:', error);
+    return;
   }
   console.log('Correo enviado:', info.response);
 });
